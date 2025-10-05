@@ -38,6 +38,8 @@ jobs:
           
           echo "workspace=$WORKSPACE" >> $GITHUB_OUTPUT
           echo "stage_env=$STAGE_ENV" >> $GITHUB_OUTPUT
+          echo "workspace=$WORKSPACE"
+          echo "stage_env=$STAGE_ENV"
 
   greeting_job:
     runs-on: ubuntu-latest
