@@ -17,6 +17,28 @@ env:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      workspace: ${{ steps.vars.outputs.workspace }}
+      stage_env: ${{ steps.vars.outputs.stage_env }}
+    steps:
+      - name: Set variables
+        id: vars
+        run: |
+          WORKSPACE=$(echo "${{ github.ref_name }}" | sed 's/\//-/g')
+          
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            STAGE_ENV="production"
+          elif [[ "${{ github.ref_name }}" == release/* ]]; then
+            STAGE_ENV="staging"
+          else
+            STAGE_ENV="development"
+          fi
+          
+          echo "workspace=$WORKSPACE" >> $GITHUB_OUTPUT
+          echo "stage_env=$STAGE_ENV" >> $GITHUB_OUTPUT
+
   greeting_job:
     runs-on: ubuntu-latest
     steps:
