@@ -1,0 +1,49 @@
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  #workflow_dispatch:
+
+env:
+  DAY: Monday
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      workspace: ${{ steps.vars.outputs.workspace }}
+      stage_env: ${{ steps.vars.outputs.stage_env }}
+    steps:
+      - name: Set variables
+        id: vars
+        run: |
+          WORKSPACE=$(echo "${{ github.ref_name }}" | sed 's/\//-/g')
+          
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            STAGE_ENV="production"
+          elif [[ "${{ github.ref_name }}" == release/* ]]; then
+            STAGE_ENV="staging"
+          else
+            STAGE_ENV="development"
+          fi
+          
+          echo "workspace=$WORKSPACE" >> $GITHUB_OUTPUT
+          echo "stage_env=$STAGE_ENV" >> $GITHUB_OUTPUT
+          echo "workspace=$WORKSPACE"
+          echo "stage_env=$STAGE_ENV"
+
+  greeting_job:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: "Say hello"
+        run: echo ${{ env.DAY }}
